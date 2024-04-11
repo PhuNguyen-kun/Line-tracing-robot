@@ -1,2 +1,1 @@
-# Line-tracing-robot
-Line-tracing robot with a stream camera detecting red-light to stop
+# Line-tracing robot with a stream camera detecting red-light to stop
