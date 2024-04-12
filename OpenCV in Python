@@ -1,0 +1,63 @@
+import cv2
+import numpy as np
+
+def set_camera_fps(cap, fps):
+  
+    cap.set(cv2.CAP_PROP_FPS, fps)
+
+def main():
+    def nothing(x):
+        pass
+
+    # Create a window with trackbars for adjusting the color range
+    cv2.namedWindow('Color Detection')
+    cv2.createTrackbar('Low H Red', 'Color Detection', 0, 8, nothing)
+    cv2.createTrackbar('High H Red', 'Color Detection', 8, 8, nothing)
+    cv2.createTrackbar('Low S Red', 'Color Detection', 100, 255, nothing)
+    cv2.createTrackbar('High S Red', 'Color Detection', 255, 255, nothing)
+    cv2.createTrackbar('Low V Red', 'Color Detection', 100, 255, nothing)
+    cv2.createTrackbar('High V Red', 'Color Detection', 255, 255, nothing)
+    cap = cv2.VideoCapture(0)
+
+    if not cap.isOpened():
+        print("Cannot open webcam.")
+        return
+
+    
+    set_camera_fps(cap, 30)
+
+    while True:
+        
+        ret, frame = cap.read()
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        # Get the HSV values for red color from the trackbars
+        low_h_red = cv2.getTrackbarPos('Low H Red', 'Color Detection')
+        high_h_red = cv2.getTrackbarPos('High H Red', 'Color Detection')
+        low_s_red = cv2.getTrackbarPos('Low S Red', 'Color Detection')
+        high_s_red = cv2.getTrackbarPos('High S Red', 'Color Detection')
+        low_v_red = cv2.getTrackbarPos('Low V Red', 'Color Detection')
+        high_v_red = cv2.getTrackbarPos('High V Red', 'Color Detection')
+
+        # Create a mask for red color
+        mask_red = cv2.inRange(hsv, (low_h_red, low_s_red, low_v_red), (high_h_red, high_s_red, high_v_red))
+
+        # Apply the mask to the original frame
+        result = cv2.bitwise_and(frame, frame, mask=mask_red)
+
+        # Display the original frame and result
+        frame = cv2.resize(frame, (600, 600))
+        result = cv2.resize(result, (600, 600))
+        Hori = np.concatenate((frame, result), axis=1)
+        cv2.imshow('Preview', Hori)
+       
+        key = cv2.waitKey(1)
+        if key == 27:
+            break
+
+   
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
